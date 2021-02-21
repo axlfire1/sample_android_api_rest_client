@@ -1,27 +1,22 @@
 package com.example.blog;
 
-import android.content.Context;
-import android.widget.Toast;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.UnsupportedEncodingException;
+import com.android.volley.AuthFailureError;
+import com.android.volley.toolbox.Volley;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.Response;
+import com.android.volley.Request;
+import android.content.Context;
+import org.json.JSONException;
+import android.widget.Toast;
+import org.json.JSONObject;
 
 public class ApiCaller {
 
-    public void Submit(String data, Context context)
-    {
+    public void Submit(String URL, String data, Context context) {
         final String savedata= data;
-        String URL="http://192.168.1.87:3000/api/v1/posts";
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
@@ -41,10 +36,7 @@ public class ApiCaller {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-
                 Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
-
                 //Log.v("VOLLEY", error.toString());
             }
         }) {

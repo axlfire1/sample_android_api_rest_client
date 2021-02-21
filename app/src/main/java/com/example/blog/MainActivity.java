@@ -29,7 +29,10 @@ public class MainActivity extends AppCompatActivity {
         JSONObject postDataParams = new JSONObject();
         postDataParams.put("title", "Manjeet");
         postDataParams.put("content", "manjeet@gmail.com");
+
         ApiCaller apiCaller = new ApiCaller();
-        apiCaller.Submit(postDataParams.toString(), context);
+
+        String URL="http://192.168.1.87:3000/api/v1/posts";
+        apiCaller.Submit(URL, postDataParams.toString(), context);
     }
 }
