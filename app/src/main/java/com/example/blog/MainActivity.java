@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
         postDataParams.put("title", "Manjeet");
         postDataParams.put("content", "manjeet@gmail.com");
         ApiCaller apiCaller = new ApiCaller();
-        // apiCaller.sendPost("http://192.168.1.75:3000/api/v1/posts", postDataParams, context);
-        apiCaller.sendGet("http://192.168.1.75:3000/api/v1/posts", context);
+        apiCaller.Submit(postDataParams.toString(), context);
     }
 }

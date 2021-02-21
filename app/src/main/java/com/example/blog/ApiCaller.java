@@ -3,93 +3,67 @@ package com.example.blog;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Iterator;
-
-import javax.net.ssl.HttpsURLConnection;
+import java.io.UnsupportedEncodingException;
 
 public class ApiCaller {
 
-    public static String sendPost(String r_url , JSONObject postDataParams, Context context) throws Exception {
-        URL url = new URL(r_url);
+    public void Submit(String data, Context context)
+    {
+        final String savedata= data;
+        String URL="http://192.168.1.87:3000/api/v1/posts";
 
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(20000);
-        conn.setConnectTimeout(20000);
-        conn.setRequestMethod("POST");
-        conn.setDoInput(true);
-        conn.setDoOutput(true);
-        OutputStream os = conn.getOutputStream();
-        BufferedWriter writer = new BufferedWriter( new OutputStreamWriter(os, "UTF-8"));
-        writer.write(encodeParams(postDataParams));
-        writer.flush();
-        writer.close();
-        os.close();
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject objres=new JSONObject(response);
+                    Toast.makeText(context,objres.toString(),Toast.LENGTH_LONG).show();
 
-        int responseCode=conn.getResponseCode();
-        if (responseCode == HttpsURLConnection.HTTP_OK) {
 
-            BufferedReader in=new BufferedReader( new InputStreamReader(conn.getInputStream()));
-            StringBuffer sb = new StringBuffer("");
-            String line="";
-            while((line = in.readLine()) != null) {
-                sb.append(line);
-                break;
+                } catch (JSONException e) {
+                    Toast.makeText(context,"Server Error",Toast.LENGTH_LONG).show();
+
+                }
+                //Log.i("VOLLEY", response);
             }
-            in.close();
-            return sb.toString();
-        }
-        return null;
-    }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
 
-    public static String sendGet(String url, Context context) throws IOException {
-        URL obj = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-        con.setRequestMethod("GET");
-        int responseCode = con.getResponseCode();
-        System.out.println("Response Code :: " + responseCode);
-        Toast.makeText(context, "Response Code :: " + responseCode, Toast.LENGTH_LONG).show();
-        if (responseCode == HttpURLConnection.HTTP_OK) { // connection ok
-            BufferedReader in = new BufferedReader(new InputStreamReader( con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
 
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
+
+                //Log.v("VOLLEY", error.toString());
             }
-            in.close();
-            return response.toString();
-        } else {
-            return "";
-        }
-    }
+        }) {
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
 
-    private static String encodeParams(JSONObject params) throws Exception {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-        Iterator<String> itr = params.keys();
-        while(itr.hasNext()){
-            String key= itr.next();
-            Object value = params.get(key);
-            if (first)
-                first = false;
-            else
-                result.append("&");
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                try {
+                    return savedata == null ? null : savedata.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    //Log.v("Unsupported Encoding while trying to get the bytes", data);
+                    return null;
+                }
+            }
 
-            result.append(URLEncoder.encode(key, "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(value.toString(), "UTF-8"));
-        }
-        return result.toString();
+        };
+        requestQueue.add(stringRequest);
     }
 }
